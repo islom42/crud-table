@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Table } from "antd";
+import { Table, Popconfirm, Button } from "antd";
 
 const DateTable = () => {
   const [gridDate, setGridDate] = useState([]);
@@ -28,6 +28,11 @@ const DateTable = () => {
     message: body,
   }));
 
+  const handleDelete = (value) => {
+    const dataSource = [...modifiedDate];
+    const filteredData = dataSource.filter((item) => item.id !== value);
+    gridDate(filteredData);
+  };
   const columns = [
     {
       title: "Id",
@@ -61,6 +66,17 @@ const DateTable = () => {
       title: "Action",
       dataIndex: "action",
       align: "center",
+      render: (_, record) =>
+        modifiedDate.length >= 1 ? (
+          <Popconfirm
+            title="Are you sure want to delete ?"
+            onConfirm={() => handleDelete(record)}
+          >
+            <Button danger type="primary">
+              Delete
+            </Button>
+          </Popconfirm>
+        ) : null,
     },
   ];
 
