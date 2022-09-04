@@ -16,9 +16,17 @@ const DateTable = () => {
       "https://jsonplaceholder.typicode.com/comments"
     );
     setGridDate(response.data);
-    console.log(response);
     setLoading(false);
   };
+  const dataWithAge = gridDate.map((item) => ({
+    ...item,
+    age: Math.floor(Math.random() * 6) + 20,
+  }));
+  const modifiedDate = dataWithAge.map((body, ...item) => ({
+    ...item,
+    key: item.id,
+    message: body,
+  }));
 
   return (
     <div>
