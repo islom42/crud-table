@@ -1,4 +1,3 @@
-import "./App.css";
 import DateTable from "./DateTable/DateTable";
 
 function App() {
