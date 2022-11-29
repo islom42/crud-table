@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Table, Popconfirm, Button } from "antd";
+import {isEmpty} from "lodash"
 
 const DateTable = () => {
   const [gridDate, setGridDate] = useState([]);
@@ -25,13 +26,14 @@ const DateTable = () => {
   const modifiedDate = dataWithAge.map(({ body, ...item }) => ({
     ...item,
     key: item.id,
-    message: body,
+    message: isEmpty(body) ? item.message : body,
   }));
 
   const handleDelete = (value) => {
     const dataSource = [...modifiedDate];
-    const filteredData = dataSource.filter((item) => item.id !== value);
-    gridDate(filteredData);
+    const filteredData = dataSource.filter((item) => item.id !== value.id);
+    setGridDate(filteredData);
+    console.log("done", gridDate)
   };
   const columns = [
     {
