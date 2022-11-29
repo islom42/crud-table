@@ -42,7 +42,7 @@ const DateTable = () => {
     return record.key === editRowKey
   }
   const cancel = () => {
-     
+     setEditRowKey("")
   }
   const edit = (record) => {
     form.setFieldsValue({
@@ -53,8 +53,20 @@ const DateTable = () => {
     })
     setEditRowKey(record.key)
   }
-  const save = () => {
-    
+  const save = async (key) => {
+    try {
+      const row = await form.validateFields()
+      const newData = [...modifiedDate];
+      const index = newData.findIndex((item) => key === item.key);
+      if(index > -1) {
+        const item = newData[index]
+        newData.splice(index, 1, {...item, ...row});
+        setGridDate(newData);
+        setEditRowKey("")
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
   }
   const columns = [
     {
