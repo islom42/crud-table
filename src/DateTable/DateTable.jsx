@@ -45,7 +45,7 @@ const DateTable = () => {
      
   }
   const edit = (record) => {
-    form.setFieldValue({
+    form.setFieldsValue({
       name: "",
       email: "",
       message: "",
@@ -126,11 +126,52 @@ const DateTable = () => {
       },
   ];
 
+  const mergedColumns = columns.map((col) => {
+    if(!col.editTable) {
+      return col
+    }
+    return {
+      ...col,
+      onCell: (record) => (
+        {
+          record,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          editing : isEditing(record),
+          
+        }
+      )
+    }
+  })
+
+  const EditableCell = ({editing, dataIndex, title, record, children, ...restProps}) => {
+    const input = <Input/>
+    return (
+      <td  {...restProps}>
+        {editing ? (
+          <Form.Item name={dataIndex} style={{marginBottom: 5}} rules={[{
+            required: true,
+            message: `Please input some value in ${title} field`
+          }]}>
+            {input}
+          </Form.Item>
+        ): (
+          children
+        )}
+      </td>
+    )
+  }
+
   return (
     <div>
      <Form form={form} component={false}>
       <Table
-          columns={columns}
+          columns={mergedColumns}
+          components={{
+            body: {
+              cell: EditableCell
+            }
+          }}
           loading={loading}
           dataSource={modifiedDate}
           bordered
