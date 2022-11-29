@@ -49,18 +49,23 @@ const DateTable = () => {
       dataIndex: "email",
       align: "center",
       editTable: true,
+      responsive: ["md"]
     },
     {
       title: "Age",
       dataIndex: "age",
       align: "center",
       editTable: false,
+      responsive: ["md"]
+
     },
     {
       title: "Message",
       dataIndex: "message",
       align: "center",
       editTable: true,
+      responsive: ["md"]
+
     },
     {
       title: "Action",
@@ -77,7 +82,7 @@ const DateTable = () => {
             </Button>
           </Popconfirm>
         ) : null,
-    },
+      },
   ];
 
   return (
