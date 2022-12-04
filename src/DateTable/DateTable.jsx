@@ -187,8 +187,16 @@ const DateTable = () => {
     )
   }
 
+  const reset = () => {
+    setSortedInfo({})
+    loadDate()
+  }
+
   return (
     <div>
+      <Space>
+        <Button style={{margin: "5px 0"}} onClick={reset}>Reset</Button>
+      </Space>
      <Form form={form} component={false}>
       <Table
           columns={mergedColumns}
