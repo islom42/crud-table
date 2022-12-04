@@ -7,6 +7,8 @@ const DateTable = () => {
   const [gridDate, setGridDate] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editRowKey, setEditRowKey] = useState("");
+  const [sortedInfo, setSortedInfo] = useState({});
+
   const [form] = Form.useForm()
 
   useEffect(() => {
@@ -78,29 +80,31 @@ const DateTable = () => {
       dataIndex: "name",
       align: "center",
       editTable: true,
+      sorter: (a, b) => a.name.length - b.name.length
     },
     {
       title: "Email",
       dataIndex: "email",
       align: "center",
       editTable: true,
-      responsive: ["md"]
+      responsive: ["md"],
+      sorter: (a, b) => a.email.length - b.email.length
     },
     {
       title: "Age",
       dataIndex: "age",
       align: "center",
       editTable: false,
-      responsive: ["md"]
-
+      responsive: ["md"],
+      sorter: (a, b) => a.age.length - b.age.length
     },
     {
       title: "Message",
       dataIndex: "message",
       align: "center",
       editTable: true,
-      responsive: ["md"]
-
+      responsive: ["md"],
+      sorter: (a, b) => a.message.length - b.message.length
     },
     {
       title: "Action",
