@@ -8,6 +8,10 @@ const DateTable = () => {
   const [loading, setLoading] = useState(false);
   const [editRowKey, setEditRowKey] = useState("");
   const [sortedInfo, setSortedInfo] = useState({});
+  const [searchText, setSearchText] = useState("");
+  let [filteredData] = useState();
+
+
 
   const [form] = Form.useForm()
 
@@ -189,12 +193,32 @@ const DateTable = () => {
 
   const reset = () => {
     setSortedInfo({})
+    setSearchText("")
     loadDate()
   }
 
+  const handleInputSearch = ({target: {value}}) => {
+    setSearchText(value)
+    if(value === "") {
+      loadDate()
+    }
+  }
+
+  const globalSearch = () => {
+    filteredData = modifiedDate.filter(({name, email, message}) => {
+      return (
+        name.toLowerCase().includes(searchText.toLowerCase()) || email.toLowerCase().includes(searchText.toLowerCase()) || message.toLowerCase().includes(searchText.toLowerCase())
+      )
+    })
+    setGridDate(filteredData)
+  }
+
+
   return (
     <div>
-      <Space>
+      <Space style={{width: "100%", justifyContent: "center"}}>
+        <Input type={"text"} placeholder="Enter text" onChange={handleInputSearch} allowClear value={searchText} />
+        <Button  onClick={globalSearch} type="primary">Search</Button>
         <Button style={{margin: "5px 0"}} onClick={reset}>Reset</Button>
       </Space>
      <Form form={form} component={false}>
@@ -206,7 +230,7 @@ const DateTable = () => {
             }
           }}
           loading={loading}
-          dataSource={modifiedDate}
+          dataSource={filteredData && filteredData.length ? filteredData : modifiedDate}
           bordered
           onChange={handleChange}
         />
