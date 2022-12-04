@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Table, Popconfirm, Button, Space, Form, Input} from "antd";
+import { Table, Popconfirm, Button, Space, Form, Input, } from "antd";
 import {isEmpty} from "lodash"
+import {SearchOutlined, StepForwardOutlined} from "@ant-design/icons";
+import Highlighter from "react-highlight-words"
 
 const DateTable = () => {
   const [gridDate, setGridDate] = useState([]);
@@ -10,7 +12,7 @@ const DateTable = () => {
   const [sortedInfo, setSortedInfo] = useState({});
   const [searchText, setSearchText] = useState("");
   const [searchColText, setSearchColText] = useState("");
-  const [searchCol, setSearchCol] = useState("");
+  const [searchedCol, setSearchedCol] = useState("");
   let [filteredData] = useState();
 
 
@@ -81,6 +83,118 @@ const DateTable = () => {
     const {order, field} = sorter[2];
     setSortedInfo({columnKey: field, order})
   }
+
+  // const getColumnSearchProps = (dataIndex) => ({
+  //   filterDropDown: ({
+  //     setSelectedKeys,
+  //     selectedKeys,
+  //     confirm,
+  //     clearFilters
+  //   }) => (
+  //     <div style={{padding: 0}}>
+  //       <Highlighter/>
+  //       <Input
+  //       placeholder={`Search ${dataIndex}`}
+  //       value={selectedKeys[0]}
+  //       onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+  //       onPressEnter={() => handleSearchCol(selectedKeys, confirm, dataIndex)}
+  //       style={{width: 188, marginBottom: 0, display: "block"}}
+  //       />
+  //       <Space>
+  //         <Button onClick={() => handleSearchCol(selectedKeys, confirm, dataIndex)}
+  //         icon={<SearchOutlined/>}
+  //         size="small"
+  //         style={{width: 90}}
+  //         >
+  //           Search
+  //         </Button>
+  //         <Button type="primary"
+  //         onClick={() => handleRestCol(clearFilters)}
+  //         size="small"
+  //         style={{width: 90}}
+  //         >
+  //           Reset
+  //         </Button>
+  //       </Space>
+  //     </div>
+  //   ),
+  //   filterIcon: (filtered) => (
+  //     <SearchOutlined style={{color: filtered ? "#1890ff" : undefined}} />
+  //   ),
+  //   onFilter: (value, record) => record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : "",
+  //   render: (text) => searchedCol === dataIndex ? (
+  //     <Highlighter
+  //       highlightStyle={{backgroundColor: "#ffc069", padding: 0}}
+  //       searchWords={[searchColText]}
+  //       autoEscape
+  //       textToHighlight={text ? text.toString() : ""}
+  //     />
+  //   ) : (text)
+  // })
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropDown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div>
+        <Input
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearchCol(selectedKeys, confirm, dataIndex)}
+          style={{width: 188, display: "block"}}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={()=>handleSearchCol(selectedKeys, confirm, dataIndex)}
+            icon={<StepForwardOutlined/>}
+            size="small"
+            style={{width: 99}}
+          >
+            Search
+          </Button>
+          <Button
+            type="primary"
+            onClick={()=>handleResetCol(clearFilters)}
+            size="small"
+            style={{width: 99}}
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <StepForwardOutlined style={{ color: filtered ? "#1890ff" : undefined}} />
+    ), 
+    onFilter: (value, record) =>
+      record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : "",
+    render: (text) =>
+      searchedCol === dataIndex ? (
+        <Highlighter
+          highlightStyle={{backgroundColor: "#ffc069", padding: 0}}
+          searchWords={[searchColText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ""}
+        />
+      ) : (text)
+  })
+    
+  const handleSearchCol = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchColText(selectedKeys[0]);
+    setSearchedCol(dataIndex)
+  }
+
+  const handleResetCol = (clearFilters) => {
+    clearFilters();
+    setSearchColText("")
+  }
+  
+
   const columns = [
     {
       title: "Id",
@@ -92,7 +206,8 @@ const DateTable = () => {
       align: "center",
       editTable: true,
       sorter: (a, b) => a.name.length - b.name.length,
-      sortOrder: sortedInfo.columnKey === 'name' && sortedInfo.order
+      sortOrder: sortedInfo.columnKey === 'name' && sortedInfo.order,
+      ...getColumnSearchProps("name"),
     },
     {
       title: "Email",
@@ -101,7 +216,8 @@ const DateTable = () => {
       editTable: true,
       responsive: ["md"],
       sorter: (a, b) => a.email.length - b.email.length,
-      sortOrder: sortedInfo.columnKey === 'email' && sortedInfo.order
+      sortOrder: sortedInfo.columnKey === 'email' && sortedInfo.order,
+      ...getColumnSearchProps("email"),
     },
     {
       title: "Age",
@@ -119,7 +235,9 @@ const DateTable = () => {
       editTable: true,
       responsive: ["md"],
       sorter: (a, b) => a.message.length - b.message.length,
-      sortOrder: sortedInfo.columnKey === 'message' && sortedInfo.order
+      sortOrder: sortedInfo.columnKey === 'message' && sortedInfo.order,
+      ...getColumnSearchProps("message")
+
     },
     {
       title: "Action",
@@ -218,6 +336,8 @@ const DateTable = () => {
 
   return (
     <div>
+      <SearchOutlined />
+      <StepForwardOutlined/>
       <Space style={{width: "100%", justifyContent: "center"}}>
         <Input type={"text"} placeholder="Enter text" onChange={handleInputSearch} allowClear value={searchText} />
         <Button  onClick={globalSearch} type="primary">Search</Button>
