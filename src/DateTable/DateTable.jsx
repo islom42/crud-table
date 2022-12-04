@@ -9,6 +9,8 @@ const DateTable = () => {
   const [editRowKey, setEditRowKey] = useState("");
   const [sortedInfo, setSortedInfo] = useState({});
   const [searchText, setSearchText] = useState("");
+  const [searchColText, setSearchColText] = useState("");
+  const [searchCol, setSearchCol] = useState("");
   let [filteredData] = useState();
 
 
