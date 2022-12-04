@@ -70,6 +70,11 @@ const DateTable = () => {
       console.log("error", error);
     }
   }
+
+  const handleChange = (...sorter) => {
+    const {order, field} = sorter[2];
+    setSortedInfo({columnKey: field, order})
+  }
   const columns = [
     {
       title: "Id",
@@ -80,7 +85,8 @@ const DateTable = () => {
       dataIndex: "name",
       align: "center",
       editTable: true,
-      sorter: (a, b) => a.name.length - b.name.length
+      sorter: (a, b) => a.name.length - b.name.length,
+      sortOrder: sortedInfo.columnKey === 'name' && sortedInfo.order
     },
     {
       title: "Email",
@@ -88,7 +94,8 @@ const DateTable = () => {
       align: "center",
       editTable: true,
       responsive: ["md"],
-      sorter: (a, b) => a.email.length - b.email.length
+      sorter: (a, b) => a.email.length - b.email.length,
+      sortOrder: sortedInfo.columnKey === 'email' && sortedInfo.order
     },
     {
       title: "Age",
@@ -96,7 +103,8 @@ const DateTable = () => {
       align: "center",
       editTable: false,
       responsive: ["md"],
-      sorter: (a, b) => a.age.length - b.age.length
+      sorter: (a, b) => a.age.length - b.age.length,
+      sortOrder: sortedInfo.columnKey === 'age' && sortedInfo.order
     },
     {
       title: "Message",
@@ -104,7 +112,8 @@ const DateTable = () => {
       align: "center",
       editTable: true,
       responsive: ["md"],
-      sorter: (a, b) => a.message.length - b.message.length
+      sorter: (a, b) => a.message.length - b.message.length,
+      sortOrder: sortedInfo.columnKey === 'message' && sortedInfo.order
     },
     {
       title: "Action",
@@ -191,6 +200,7 @@ const DateTable = () => {
           loading={loading}
           dataSource={modifiedDate}
           bordered
+          onChange={handleChange}
         />
      </Form>
     </div>
