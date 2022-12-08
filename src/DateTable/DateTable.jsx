@@ -13,6 +13,8 @@ const DateTable = () => {
   const [searchText, setSearchText] = useState('');
   const [searchColText, setSearchColText] = useState('');
   const [searchedCol, setSearchedCol] = useState('');
+  const [filteredInfo, setFilteredInfo] = useState({});
+
   let [filteredData] = useState();
 
   const [form] = Form.useForm();
@@ -76,8 +78,9 @@ const DateTable = () => {
     }
   };
 
-  const handleChange = (...sorter) => {
-    const { order, field } = sorter[2];
+  const handleChange = (_, filter, sorter) => {
+    const { order, field } = sorter;
+    setFilteredInfo(filter)
     setSortedInfo({ columnKey: field, order });
   };
 
@@ -185,6 +188,16 @@ const DateTable = () => {
       responsive: ['md'],
       sorter: (a, b) => a.age.length - b.age.length,
       sortOrder: sortedInfo.columnKey === 'age' && sortedInfo.order,
+      filters: [
+        {text: "20", value: "20"},
+        {text: "21", value: "21"},
+        {text: "22", value: "22"},
+        {text: "23", value: "23"},
+        {text: "24", value: "24"},
+        {text: "25", value: "25"},
+      ],
+      filteredValue: filteredInfo.age || null,
+      onFilter: (value, record) => String(record.age).includes(value)
     },
     {
       title: 'Message',
@@ -286,6 +299,7 @@ const DateTable = () => {
 
   const reset = () => {
     setSortedInfo({});
+    setFilteredInfo({})
     setSearchText('');
     loadDate();
   };
