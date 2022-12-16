@@ -3,6 +3,9 @@
   padding: 0;
   box-sizing: border-box;
 }
+body {
+  background-image: linear-gradient(to right, #3b83f638, #06b5d44b);
+}
 .App {
   width: 80%;
   margin: 0 auto;
