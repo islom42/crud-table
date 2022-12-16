@@ -37,6 +37,7 @@ const DateTable = () => {
   }));
   const modifiedDate = dataWithAge.map(({ body, ...item }) => ({
     ...item,
+    info: `My name is ${item.email.split("@")[0]} and I am ${item.age} years old`,
     key: item.id,
     message: isEmpty(body) ? item.message : body,
   }));
@@ -351,6 +352,13 @@ const DateTable = () => {
           dataSource={
             filteredData && filteredData.length ? filteredData : modifiedDate
           }
+          expandable={{
+            expandedRowRender: (record) => (
+              <p style={{margin: 0}}>
+                {record.info}
+              </p>
+            )
+          }}
           bordered
           onChange={handleChange}
         />
