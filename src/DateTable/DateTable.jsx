@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { Table, Popconfirm, Button, Space, Form, Input } from 'antd';
 import { isEmpty } from 'lodash';
@@ -17,6 +17,9 @@ const DateTable = () => {
   const [searchColText, setSearchColText] = useState('');
   const [searchedCol, setSearchedCol] = useState('');
   const [filteredInfo, setFilteredInfo] = useState({});
+  const type = "DraggableBodyRow";
+  const tableRef = useRef();
+
 
   let [filteredData] = useState();
 
@@ -34,16 +37,76 @@ const DateTable = () => {
     setGridDate(response.data);
     setLoading(false);
   };
-  const dataWithAge = gridDate.map((item) => ({
-    ...item,
-    age: Math.floor(Math.random() * 6) + 20,
-  }));
-  const modifiedDate = dataWithAge.map(({ body, ...item }) => ({
-    ...item,
-    info: `My name is ${item.email.split("@")[0]} and I am ${item.age} years old`,
-    key: item.id,
-    message: isEmpty(body) ? item.message : body,
-  }));
+
+ const DraggableBodyRow = ({
+  index,
+  moveRow,
+  className,
+  style,
+  ...restProps
+ }) => {
+  const ref = useRef();
+  const [{isOver, dropClassName}, drop] = useDrop({
+    accept: type,
+    collect: (monitor) => {
+      const {index: dragIndex} = monitor.getItem() || {};
+      if(dragIndex === index) {
+        return {}
+      }
+      return {
+        isOver: monitor.isOver(),
+        dropClassName: dragIndex < index ? "drop-down-downward" : "drop-over-upward"
+      }
+    },
+    drop: (item) => {
+      moveRow(item.index, index)
+    }
+  })
+  const [, drag] = useDrag({
+    type,
+    item: {index},
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging()
+    })
+  });
+  drop(drag(ref))
+
+  return (
+    <tr
+      ref={ref}
+      className={`${className}${isOver ? dropClassName :  ""}`}
+      style={{cursor: "move", ...style}}
+      {...restProps}
+    />
+  )
+ }
+ const dataWithAge = gridDate.map((item) => ({
+  ...item,
+  age: Math.floor(Math.random() * 6) + 20,
+}));
+
+ const modifiedDate = dataWithAge.map(({ body, ...item }) => ({
+  ...item,
+  info: `My name is ${item.email.split("@")[0]} and I am ${item.age} years old`,
+  key: item.id,
+  message: isEmpty(body) ? item.message : body,
+}));
+
+ const moveRow = useCallback((dragIndex, hoverIndex) => {
+  const dragRow = modifiedDate[dragIndex];
+  setGridDate(update(
+    modifiedDate, {
+      $splice: [
+        [dragIndex, 1],
+        [hoverIndex, 0, dragRow]  
+      ]
+    })
+  );
+  },
+  [modifiedDate]
+ );
+
+  
 
   const handleDelete = (value) => {
     const dataSource = [...modifiedDate];
@@ -344,27 +407,38 @@ const DateTable = () => {
         </Button>
       </Space>
       <Form form={form} component={false}>
-        <Table
-          columns={mergedColumns}
-          components={{
-            body: {
-              cell: EditableCell,
-            },
-          }}
-          loading={loading}
-          dataSource={
-            filteredData && filteredData.length ? filteredData : modifiedDate
-          }
-          expandable={{
-            expandedRowRender: (record) => (
-              <p style={{margin: 0}}>
-                {record.info}
-              </p>
-            )
-          }}
-          bordered
-          onChange={handleChange}
-        />
+        <DndProvider backend={HTML5Backend}>
+          <Table
+            ref={tableRef }
+            columns={mergedColumns}
+            components={{
+              body: {
+                cell: EditableCell,
+                row: DraggableBodyRow
+              },
+            }}
+            onRow={(record, index) => (
+              {
+                index,
+                moveRow
+              }
+            )}
+            loading={loading}
+            dataSource={
+              filteredData && filteredData.length ? filteredData : modifiedDate
+            }
+            expandable={{
+              expandedRowRender: (record) => (
+                <p style={{margin: 0}}>
+                  {record.info}
+                </p>
+              )
+            }}
+            bordered
+            onChange={handleChange}
+          />
+        </DndProvider>
+        
       </Form>
     </div>
   );
