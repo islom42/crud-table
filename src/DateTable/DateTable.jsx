@@ -7,6 +7,7 @@ import Highlighter from 'react-highlight-words';
 import {DndProvider, useDrag, useDrop} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import update from "immutability-helper";
+import {CSVLink} from "react-csv"
 
 const DateTable = () => {
   const [gridDate, setGridDate] = useState([]);
@@ -15,6 +16,7 @@ const DateTable = () => {
   const [sortedInfo, setSortedInfo] = useState({});
   const [searchText, setSearchText] = useState('');
   const [searchColText, setSearchColText] = useState('');
+  const [showFilter, setShowFilter] = useState(true)
   const [searchedCol, setSearchedCol] = useState('');
   const [filteredInfo, setFilteredInfo] = useState({});
   const type = "DraggableBodyRow";
@@ -153,6 +155,7 @@ const DateTable = () => {
 
   const handleSearchCol = (selectedKeys, confirm, dataIndex) => {
     confirm();
+    setShowFilter(false)
     setSearchColText(selectedKeys[0]);
     setSearchedCol(dataIndex);
   };
@@ -160,7 +163,22 @@ const DateTable = () => {
   const handleResetCol = (clearFilters) => {
     clearFilters();
     setSearchColText('');
+    setShowFilter(true)
   };
+
+  const filterObj = {
+    filters: [
+      {text: "20", value: "20"},
+      {text: "21", value: "21"},
+      {text: "22", value: "22"},
+      {text: "23", value: "23"},
+      {text: "24", value: "24"},
+      {text: "25", value: "25"},
+    ],
+    filteredValue: filteredInfo.age || null,
+    onFilter: (value, record) => String(record.age).includes(value)
+  }
+
   const filterDropDown = (
     { setSelectedKeys, selectedKeys, confirm, clearFilters },
     dataIndex
@@ -220,6 +238,8 @@ const DateTable = () => {
       ),
   });
 
+  const showFilterAge = showFilter ? filterObj : null
+
   const columns = [
     {
       title: 'Id',
@@ -255,16 +275,7 @@ const DateTable = () => {
       responsive: ['lg'],
       sorter: (a, b) => a.age.length - b.age.length,
       sortOrder: sortedInfo.columnKey === 'age' && sortedInfo.order,
-      filters: [
-        {text: "20", value: "20"},
-        {text: "21", value: "21"},
-        {text: "22", value: "22"},
-        {text: "23", value: "23"},
-        {text: "24", value: "24"},
-        {text: "25", value: "25"},
-      ],
-      filteredValue: filteredInfo.age || null,
-      onFilter: (value, record) => String(record.age).includes(value)
+      ...showFilterAge
     },
     {
       title: 'Message',
@@ -404,6 +415,9 @@ const DateTable = () => {
         </Button>
         <Button style={{ margin: '5px 0' }} onClick={reset}>
           Reset
+        </Button>
+        <Button style={{backgroundColor: "#ff4d4f", color: "#fff"}}>
+          <CSVLink data={filteredData && filteredData.length ? filteredData : modifiedDate}>Export</CSVLink>
         </Button>
       </Space>
       <Form form={form} component={false}>

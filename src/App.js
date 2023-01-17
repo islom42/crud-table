@@ -1,10 +1,15 @@
+import React from "react";
+import Footer from "./Footer";
 import DateTable from "./DateTable/DateTable";
 
 function App() {
   return (
-    <div className="App">
-      <DateTable />
-    </div>
+    <React.Fragment>
+      <div className="App">
+        <DateTable />
+      </div>
+      <Footer/>
+    </React.Fragment>
   );
 }
 
